@@ -19,6 +19,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  sendgrid:
+    api-key: SG.Qa6E2CDHRdKLsAIJm22nKQ.On2HRLY6IxWCeNv0N6m0xFE2KFdIGCbCcW2rKCenqnM
+    from-email: baobanbanhbao33@gmail.com
 
 springdoc:
   api-docs:
