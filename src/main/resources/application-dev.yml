@@ -20,8 +20,10 @@ spring:
       hibernate:
         format_sql: true
   sendgrid:
-    api-key: SG.Qa6E2CDHRdKLsAIJm22nKQ.On2HRLY6IxWCeNv0N6m0xFE2KFdIGCbCcW2rKCenqnM
+    api-key: ${SENDGRID_API_KEY}
     from-email: baobanbanhbao33@gmail.com
+    template-id: d-7138fd180a074616849cf0cfaad31d7c
+    verification-link: http://localhost:8080/user/confirm-email
 
 springdoc:
   api-docs:

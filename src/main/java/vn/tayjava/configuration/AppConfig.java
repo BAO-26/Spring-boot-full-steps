@@ -16,9 +16,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 public class AppConfig {
 
-    @Value("${spring.sendgrid.api-key}")
-    private String sendgridApiKey;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -41,8 +38,8 @@ public class AppConfig {
     }
 
     @Bean
-    public SendGrid sendGrid() {
-        return new SendGrid(sendgridApiKey);
+    public SendGrid sendGrid(@Value("${spring.sendgrid.api-key}") String apiKey) {
+        return new SendGrid(apiKey);
     }
 
 }
