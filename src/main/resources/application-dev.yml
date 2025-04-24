@@ -37,3 +37,10 @@ openapi:
     server: http://localhost:${server.port}
     title: Backend service
     version: 1.0.0
+
+# Generate HMAC Authentication Code: https://www.devglan.com/online-tools/hmac-sha256-online
+jwt:
+  expiryMinutes: 1
+  expiryDay: 14
+  accessKey: IIwLeRIVsznVTPFEYmA6HiVVBrlKkKqC36OpWzqw8mk=
+  refreshKey: tvszknimPZQEdy3c9TCERBLAkOyoCc2ZvOmGcHsRJgg=

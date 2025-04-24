@@ -1,4 +1,4 @@
-package vn.tayjava.config;
+package vn.tayjava.configuration;
 
 import com.sendgrid.SendGrid;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +86,7 @@ public class AppConfig {
     }
 
     @Bean
-    public SendGrid sendGrid(@Value("${spring.sendGrid.apiKey}") String apiKey) {
+    public SendGrid sendGrid(@Value("${spring.sendgrid.api-key}") String apiKey) {
         return new SendGrid(apiKey);
     }
 
