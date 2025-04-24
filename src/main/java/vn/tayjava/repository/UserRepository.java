@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import vn.tayjava.model.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
@@ -18,7 +19,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "or lower(u.email) like :keyword)")
     Page<UserEntity> searchByKeyword(String keyword, Pageable pageable);
 
-    UserEntity findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     UserEntity findByEmail(String email);
 }
