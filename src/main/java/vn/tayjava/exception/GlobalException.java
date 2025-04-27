@@ -9,11 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
@@ -34,7 +32,6 @@ public class GlobalException {
      */
     @ExceptionHandler({ConstraintViolationException.class,
             MissingServletRequestParameterException.class, MethodArgumentNotValidException.class})
-//    @ResponseStatus(BAD_REQUEST)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
@@ -80,20 +77,19 @@ public class GlobalException {
     }
 
     /**
-     * Handle exception when user not authenticated
+     * Handle exception when the request not found data
      *
      * @param e
      * @param request
      * @return
      */
     @ExceptionHandler(InternalAuthenticationServiceException.class)
-//    @ResponseStatus(BAD_REQUEST)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Unauthorized",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
                             examples = @ExampleObject(
                                     name = "401 Response",
-                                    summary = "Handle exception when resource not found",
+                                    summary = "Handle exception when user not authenticated",
                                     value = """
                                             {
                                               "timestamp": "2023-10-19T06:07:35.321+00:00",
@@ -124,7 +120,6 @@ public class GlobalException {
      * @return
      */
     @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
-//    @ResponseStatus(BAD_REQUEST)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
