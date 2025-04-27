@@ -1,5 +1,6 @@
 package vn.tayjava.configuration;
 
+import com.google.gson.Gson;
 import com.sendgrid.SendGrid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,21 +21,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import vn.tayjava.configuration.CustomizeRequestFilter;
 import vn.tayjava.service.UserServiceDetail;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AppConfig {
-
-    private final String[] whitelistedUrls = {
-            "/auth/**"
-    };
 
     private final CustomizeRequestFilter requestFilter;
     private final UserServiceDetail userServiceDetail;
+    private final String[] whitelistedUrls = {"/auth/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,11 +49,6 @@ public class AppConfig {
         return webSecurity -> webSecurity
                 .ignoring()
                 .requestMatchers("/actuator/**", "/v3/**", "/webjars/**", "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**", "/favicon.ico");
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -86,8 +80,17 @@ public class AppConfig {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SendGrid sendGrid(@Value("${spring.sendgrid.api-key}") String apiKey) {
         return new SendGrid(apiKey);
     }
 
+    @Bean
+    public Gson gson() {
+        return new Gson();
+    }
 }

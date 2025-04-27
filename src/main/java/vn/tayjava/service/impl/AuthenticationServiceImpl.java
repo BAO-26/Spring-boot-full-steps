@@ -21,6 +21,8 @@ import vn.tayjava.repository.UserRepository;
 import vn.tayjava.service.AuthenticationService;
 import vn.tayjava.service.JwtService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static vn.tayjava.common.TokenType.REFRESH_TOKEN;
@@ -39,12 +41,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public TokenResponse getAccessToken(SignInRequest request) {
         log.info("Get access token");
 
+        List<String> authorities = new ArrayList<>();
         try {
             // Thực hiện xác thực với username và password
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
             log.info("isAuthenticated = {}", authenticate.isAuthenticated());
             log.info("Authorities: {}", authenticate.getAuthorities().toString());
+            authorities.add(authenticate.getAuthorities().toString());
 
             // Nếu xác thực thành công, lưu thông tin vào SecurityContext
             SecurityContextHolder.getContext().setAuthentication(authenticate);
@@ -53,20 +57,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AccessDeniedException(e.getMessage());
         }
 
-        // Get user
-        // sử dụng var với getAuthorities được
-        var user = userRepository.findByUsername(request.getUsername());
-        if (user == null) {
-            throw new UsernameNotFoundException(request.getUsername());
-        }
+        String accessToken = jwtService.generateAccessToken(request.getUsername(), authorities);
+        String refreshToken = jwtService.generateRefreshToken(request.getUsername(), authorities);
 
-        String accessToken = jwtService.generateAccessToken(user.get().getId(), user.get().getUsername(), user.get().getAuthorities());
-        String refreshToken = jwtService.generateRefreshToken(user.get().getId(), user.get().getUsername(), user.get().getAuthorities());
-
-        return TokenResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     @Override
@@ -84,13 +78,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             // check user is active or inactivated
             Optional<UserEntity> user = userRepository.findByUsername(userName);
 
-            // generate new access token
-            String accessToken = jwtService.generateAccessToken(user.get().getId(), user.get().getUsername(), user.get().getAuthorities());
+            List<String> authorities = new ArrayList<>();
+            user.get().getAuthorities().forEach(authority -> authorities.add(authority.getAuthority()));
 
-            return TokenResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+            // generate new access token
+            String accessToken = jwtService.generateAccessToken(user.get().getUsername(), authorities);
+
+            return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
         } catch (Exception e) {
             log.error("Access denied! errorMessage: {}", e.getMessage());
             throw new ForbiddenException(e.getMessage());

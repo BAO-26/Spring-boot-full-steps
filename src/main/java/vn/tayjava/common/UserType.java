@@ -1,5 +1,5 @@
 package vn.tayjava.common;
 
 public enum UserType {
-    OWNER, ADMIN, USER
+    SYSTEM_ADMIN, ADMIN, MANAGER, USER
 }
