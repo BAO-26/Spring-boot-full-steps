@@ -28,6 +28,7 @@ import vn.tayjava.service.UserService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +39,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public UserPageResponse findAll(String keyword, String sort, int page, int size) {
@@ -72,7 +73,7 @@ public class UserServiceImpl implements UserService {
         Page<UserEntity> entityPage;
 
         if (StringUtils.hasLength(keyword)) {
-            keyword = "%" + keyword.toLowerCase() + "%";
+            keyword = "%" + keyword + "%";
             entityPage = userRepository.searchByKeyword(keyword, pageable);
         } else {
             entityPage = userRepository.findAll(pageable);
@@ -101,12 +102,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse findByUsername(String username) {
-        return null;
+        log.info("Find user by username: {}", username);
+
+        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
+
+        return UserResponse.builder()
+                .id(userEntity.get().getId())
+                .firstName(userEntity.get().getFirstName())
+                .lastName(userEntity.get().getLastName())
+                .gender(userEntity.get().getGender())
+                .birthday(userEntity.get().getBirthday())
+                .username(userEntity.get().getUsername())
+                .phone(userEntity.get().getPhone())
+                .email(userEntity.get().getEmail())
+                .build();
     }
 
     @Override
     public UserResponse findByEmail(String email) {
-        return null;
+        log.info("Find user by email: {}", email);
+
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        return UserResponse.builder()
+                .id(userEntity.getId())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .gender(userEntity.getGender())
+                .birthday(userEntity.getBirthday())
+                .username(userEntity.getUsername())
+                .phone(userEntity.getPhone())
+                .email(userEntity.getEmail())
+                .build();
     }
 
     @Override
@@ -130,11 +157,11 @@ public class UserServiceImpl implements UserService {
         user.setType(req.getType());
         user.setStatus(UserStatus.NONE);
 
-        userRepository.save(user);
+        UserEntity result = userRepository.save(user);
         log.info("Saved user: {}", user);
 
-        if (user.getId() != null) {
-            log.info("user id: {}", user.getId());
+        if (result.getId() != null) {
+            log.info("user id: {}", result.getId());
             List<AddressEntity> addresses = new ArrayList<>();
             req.getAddresses().forEach(address -> {
                 AddressEntity addressEntity = new AddressEntity();
@@ -146,7 +173,7 @@ public class UserServiceImpl implements UserService {
                 addressEntity.setCity(address.getCity());
                 addressEntity.setCountry(address.getCountry());
                 addressEntity.setAddressType(address.getAddressType());
-                addressEntity.setUserId(user.getId());
+                addressEntity.setUserId(result.getId());
                 addresses.add(addressEntity);
             });
             addressRepository.saveAll(addresses);
@@ -157,10 +184,10 @@ public class UserServiceImpl implements UserService {
         try {
             emailService.sendVerificationEmail(req.getEmail(), req.getUsername());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new InvalidDataException("Send email failed");
         }
 
-        return user.getId();
+        return result.getId();
     }
 
     @Override
