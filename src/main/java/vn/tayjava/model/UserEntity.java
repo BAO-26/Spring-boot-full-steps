@@ -15,6 +15,7 @@ import vn.tayjava.common.Gender;
 import vn.tayjava.common.UserStatus;
 import vn.tayjava.common.UserType;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,11 +80,7 @@ public class UserEntity extends AbstractEntity<Long> implements UserDetails, Ser
         List<String> roleNames = roleList.stream().map(Role::getName).toList();
         log.info("User roles: {}", roleNames);
 
-        // Add role name to authority
         return roleNames.stream().map(SimpleGrantedAuthority::new).toList();
-
-        // hasRole / hasAnyRole
-        // return roleNames.stream().map(s -> new SimpleGrantedAuthority("ROLE_" + s.toUpperCase())).toList();
     }
 
     @Override
@@ -104,5 +101,16 @@ public class UserEntity extends AbstractEntity<Long> implements UserDetails, Ser
     @Override
     public boolean isEnabled() {
         return UserStatus.ACTIVE.equals(status);
+    }
+
+    // fix lỗi từ SonarQube: Make non-static "roles/groups" transient or serializable (nếu dùng transient tại biến roles/groups thì khi run project sẽ bỏ qua 2 biến đấy -> 403 fobidden)
+    private void writeObject(java.io.ObjectOutputStream stream)
+            throws IOException {
+        stream.defaultWriteObject();
+    }
+
+    private void readObject(java.io.ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
     }
 }

@@ -1,9 +1,9 @@
 FROM openjdk:17
 
-ARG FILE_JAR=target/*.jar
+ARG JAR_FILE=target/*.jar
 
-ADD ${FILE_JAR} api-service.jar
+COPY ${JAR_FILE} backend-service.jar
 
-ENTRYPOINT ["java", "-jar", "api-service.jar"]
+ENTRYPOINT ["java", "-jar", "backend-service.jar"]
 
 EXPOSE 8080
