@@ -5,9 +5,9 @@ spring:
   devtools:
     add-properties: true
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/backend_service}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:150208}
+    url: ${POSTGRES_URL:jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/backend_service}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:150208}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -21,9 +21,9 @@ spring:
         format_sql: true
   sendgrid:
     api-key: ${SENDGRID_API_KEY:SG.Qa6E2CDHRdKLsAIJm22nKQ.On2HRLY6IxWCeNv0N6m0xFE2KFdIGCbCcW2rKCenqnM}
-    from-email: baobanbanhbao33@gmail.com
-    template-id: d-7138fd180a074616849cf0cfaad31d7c
-    verification-link: http://localhost:8080/user/confirm-email
+    from-email: ${SENDGRID_FROM_EMAIL:baobanbanhbao33@gmail.com}
+    template-id: ${SENDGRID_TEMPLATE_ID:d-7138fd180a074616849cf0cfaad31d7c}
+    verification-link: ${SENDGRID_VERIFICATION_LINK:http://localhost:8080/user/confirm-email}
 
 springdoc:
   api-docs:
